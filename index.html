@@ -2,6 +2,10 @@
 <head>
 	<title>data.stack One page tracker</title>
 	<script type="text/javascript">
+		var d = document;
+		d.i = d.getElementById;
+		d.c = d.getElementsByClassName
+		
 		// --------- FOR USERS ---------------
 		var base_url = localStorage.getItem("base_url");
 		var username = localStorage.getItem("username");
@@ -246,13 +250,13 @@
 
 		var RELEASE = "REL1011";
 
-		var statusSummary = document.getElementById("statusSummary");
-		var table = document.getElementById("table");
+		var statusSummary = d.i("statusSummary");
+		var table = d.i("table");
 
 		function checkConfig(){
-			let div_display = document.getElementById("div-display");
-			let div_login = document.getElementById("div_login");
-			let div_config = document.getElementById("div_config");
+			let div_display = d.i("div-display");
+			let div_login = d.i("div_login");
+			let div_config = d.i("div_config");
 			div_display.style.display = "none";
 			div_login.style.display = "none";
 			div_config.style.display = "none";
@@ -272,9 +276,9 @@
 		checkConfig()
 
 		function saveConfig(){
-			base_url = document.getElementById("input_url").value;
-			username = document.getElementById("input_username").value;
-			password = document.getElementById("input_password").value;
+			base_url = d.i("input_url").value;
+			username = d.i("input_username").value;
+			password = d.i("input_password").value;
 			localStorage.setItem("base_url", base_url);
 			localStorage.setItem("username", username);
 			localStorage.setItem("password", password);
@@ -307,16 +311,13 @@
 
 		function getReleasesCB(data){
 			releases = data;
-			let select = document.getElementById("select_release");
+			let select = d.i("select_release");
 			let option = document.createElement('option');
 			let selectedIndex = 0;
 			releases.forEach((release, index) => {
 				let clone = option.cloneNode();
 				clone.value = release._id;
-				if(release._id == RELEASE) {
-					console.log(release._id, RELEASE);
-					selectedIndex = index;
-				}
+				if(release._id == RELEASE) selectedIndex = index;
 				clone.innerHTML = release.releaseVersion;
 				select.appendChild(clone);
 			})
@@ -324,7 +325,7 @@
 		}
 
 		function getDefects(){
-			let input_select = document.getElementById("select_release");
+			let input_select = d.i("select_release");
 			// let filter = generateFilter(input_select.value);
 			RELEASE = input_select.value;
 			let filter = {"releaseVersion._id":`/${input_select.value}/`};
@@ -424,8 +425,8 @@
 			let styles = cellClass.split(" ")[0].split("_");
 			let rowClass = `${styles[0]}_${styles[1]}`;
 			originalStyle = cellClass;
-			document.getElementsByClassName(rowClass)[0].style.backgroundColor = "powderblue";
-			let cell = document.getElementsByClassName(cellClass)[0];
+			d.c(rowClass)[0].style.backgroundColor = "powderblue";
+			let cell = d.c(cellClass)[0];
 			if(cellClass.indexOf("tableButton") != -1 && cellClass.indexOf("leaveIt") == -1) {
 				cell.style.backgroundColor = "steelblue";
 				cell.style.color = "white";
@@ -436,8 +437,8 @@
 			let cellClass = cellRef.getAttribute("class");
 			let styles = cellClass.split(" ")[0].split("_");
 			let rowClass = `${styles[0]}_${styles[1]}`;
-			document.getElementsByClassName(rowClass)[0].style.backgroundColor = "white";
-			let cell = document.getElementsByClassName(cellClass)[0]
+			d.c(rowClass)[0].style.backgroundColor = "white";
+			let cell = d.c(cellClass)[0]
 			if(cellClass.indexOf("tableButton") != -1 && cellClass.indexOf("leaveIt") == -1) {
 				cell.style.backgroundColor = "white";
 				cell.style.color = "black";
@@ -446,11 +447,11 @@
 		}
 
 		function showAll(className){
-			Array.from(document.getElementsByClassName(className)).forEach(elem => elem.style.display = "table-row")
+			Array.from(d.c(className)).forEach(elem => elem.style.display = "table-row")
 		}
 
 		function hideAll(className){
-			Array.from(document.getElementsByClassName(className)).forEach(elem => elem.style.display = "none");
+			Array.from(d.c(className)).forEach(elem => elem.style.display = "none");
 		}
 
 		function filterTable(status, priority){
@@ -510,8 +511,6 @@
 			});
 		getDefectPriorityAggregation();
 		}
-
-		// login()
 		
 	</script>
 
