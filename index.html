@@ -60,22 +60,30 @@
 		.body{
 			font-family: monospace;
 			font-weight: lighter;
-			font-size:  13px;
+			font-size: 13px;
+			margin: 0px;
 		}
 
 		.menu {
 			background-color: lightgrey;
-			padding: .5rem;
 			display: block;
+			padding: 10px;
+			border-bottom: 1px solid black;
+		}
+
+		.data {
+			margin: 10px;
 		}
 
 		.config {
 			padding: 10px;
-			margin: 10px 20px;
+			margin: 10rem auto;
 			border: 1px solid gray;
 			border-radius: 5px;
 			width: 325px;
+			display: block;
 			box-shadow: 2px 2px 4px lightgrey;
+			text-align: center;
 		}
 
 		.config label{
@@ -123,7 +131,7 @@
 			border: 1px solid black;
 		}
 
-		.statusSummaryCol1 {
+		.statusAll {
 			width: 200px !important;
 		}
 
@@ -165,24 +173,19 @@
 			background-color: slategray;
 		}
 
+		.logoutMessage {
+			padding: 10px;
+			background-color: lightcoral;
+			font-size: 13px;
+			border-radius: 2px;
+			box-shadow: 2px 2px 4px lightcoral;
+			margin: 20px;
+		}
+
 	</style>
 
 </head>
 <body class="body">
-
-	<div id="div-display">
-		<div id="div-menu" class="menu">
-			<span>vNext</span>
-			<button id="button-vnext-defects" type="button" onclick="getDefects('vNext')">Defects</button>
-			<button id="button-login" type="button" class="resetButton" style="float:right;" onclick="reset()">Reset Config</button>
-		</div>
-
-		<div id="div-data">
-			<table id="statusSummary" class="statusSummary"></table>
-			<table id="table" class="dataTable">
-			</table>
-		</div>
-	</div>
 
 	<div class="config" id="div_config">
 		<h3>Set Config</h3>
@@ -191,15 +194,32 @@
 		<p><label>Password</label><input id="input_password" type="password" name="Password" size="30"></p>
 		<p><button onclick="saveConfig()">Save</button></p>
 	</div>
+	
+	<div id="div-display">
+		<div id="div-menu" class="menu">
+			<label for="releases">Release</label>
+			<select name="releases" id="select_release">
+			</select>
+			<button id="button-vnext-defects" type="button" onclick="getDefects('vNext')">Defects</button>
+			<button id="button-login" type="button" class="resetButton" style="float:right;" onclick="reset()">Reset Config</button>
+		</div>
+
+		<div id="div-data" class="data">
+			<table id="statusSummary" class="statusSummary"></table>
+			<table id="table" class="dataTable">
+			</table>
+		</div>
+	</div>
 
 	<div class="config" id="div_login">
+		<p class="logoutMessage">Session timedout. Please login again.</p>
 		<button id="button-login" type="button" onclick="login()">Login</button>
-		<button id="button-login" type="button" class="resetButton" onclick="reset()">RESET</button>
+		<button id="button-login" type="button" class="resetButton" onclick="reset()">Reset</button>
 	</div>
 
 	<script type="text/javascript">
 
-		let statusClassMapper = {
+		const statusClassMapper = {
 			"Open": "open",
 			"In Progress": "inprogress",
 			"Ready for QA": "readyforqa",
@@ -217,6 +237,13 @@
 			"Total": "total",
 		};
 
+		const status_classes = ["status_open", "status_inprogress", "status_readyforqa", "status_readyforrelease", "status_rejected", "status_cannotreproduce", "status_workingasexpected", "status_configurationissue", "status_duplicate", "status_closed", "status_reopen", "status_fixed", "status_readyforit"];
+
+		const priority_classes = ["priority_highest", "priority_high", "priority_medium", "priority_low", "priority_lowest"];
+
+		var releases = null;
+
+
 		var RELEASE = "REL1011";
 
 		var statusSummary = document.getElementById("statusSummary");
@@ -231,6 +258,7 @@
 			div_config.style.display = "none";
 			if(token){
 				div_display.style.display = "block";
+				getReleases();
 			} else if(!base_url || !username || !password) {
 				localStorage.removeItem("token");
 				localStorage.removeItem("base_url");
@@ -263,21 +291,48 @@
 
 		function login(){
 			let data = {username, password};
-			apiCaller("POST", "/api/a/rbac/login", null, null, data, null)
+			apiCaller("POST", "/api/a/rbac/login", null, null, data, getReleases)
 		}
 
 		function generateFilter(release){
 			return {"$and":[{"$or":[{"releaseVersion._id":`/${release}/`},{"releaseVersion.releaseVersion":`/${release}/`}]}]}
 		}
 
+		function getReleases(){
+			let select = "_id,releaseVersion,plannedReleaseDate,released";
+			let count = 10000;
+			let sort = "releaseVersion";
+			apiCaller("GET", "/api/c/data-stack/release", null, {select, sort, count}, null, getReleasesCB)
+		}
+
+		function getReleasesCB(data){
+			releases = data;
+			let select = document.getElementById("select_release");
+			let option = document.createElement('option');
+			let selectedIndex = 0;
+			releases.forEach((release, index) => {
+				let clone = option.cloneNode();
+				clone.value = release._id;
+				if(release._id == RELEASE) {
+					console.log(release._id, RELEASE);
+					selectedIndex = index;
+				}
+				clone.innerHTML = release.releaseVersion;
+				select.appendChild(clone);
+			})
+			select.selectedIndex = selectedIndex;
+		}
+
 		function getDefects(){
-			let filter = generateFilter('vNext');
+			let input_select = document.getElementById("select_release");
+			// let filter = generateFilter(input_select.value);
+			RELEASE = input_select.value;
+			let filter = {"releaseVersion._id":`/${input_select.value}/`};
 			let select = "_id,summary,priority,estimateDays,status,releaseVersion.releaseVersion,assignedTo._id,verifiedBy._id,reportedBy._id";
 			let count = 10000;
 			let sort = "priority";
-			apiCaller("GET", "/api/c/data-stack/defects", null, {filter, select, sort, count}, null, getDetectsDB)
+			apiCaller("GET", "/api/c/data-stack/defects", null, {filter, select, sort, count}, null, getDetectsCB)
 		}
-		// getDefects("vNext");
 
 		function getDefectPriorityAggregation(){
 			let aggregationPipeline = [{"$match": {"releaseVersion._id": RELEASE}},{"$group": {"_id": "$priority","count": {"$sum": 1}}},{"$sort": {"_id": 1}}];
@@ -293,8 +348,8 @@
 			});
 			
 			statusSummary.innerHTML = "";
-			statusSummary.appendChild(generateStatusSummaryRow("statusSummaryCol1", 1, "Status", {"count":"Count", "highest":"Highest", "high":"High", "medium":"Medium", "low":"Low", "lowest":"Lowest"}))
-			statusSummary.appendChild(generateStatusSummaryRow("statusSummaryCol1", 2, "Total", {...counter, ...{count}}))
+			statusSummary.appendChild(generateStatusSummaryRow("statusAll", 1, "Status", {"count":"Count", "highest":"Highest", "high":"High", "medium":"Medium", "low":"Low", "lowest":"Lowest"}))
+			statusSummary.appendChild(generateStatusSummaryRow("statusAll", 2, "Total", {...counter, ...{count}}))
 			getDefectStatusAggregation()
 		}
 
@@ -340,13 +395,20 @@
 			row.appendChild(clone_text);
 			clone_text.setAttribute("class", `${css} tableButton`);
 			clone_text.appendChild(document.createTextNode(text))
+			clone_text.setAttribute("onclick", `filterTable("status_${css}", "priority_count")`)
 			let counter = 0;
 			keys.forEach(k => {
 				let clone = data.cloneNode();
 				row.appendChild(clone);
-				if(values[k] == 0) clone.setAttribute("class", `status_${css} priority_${k} summary_${rowCounter}_${counter} cellDisabled`);
-				else if(keys.indexOf(values[k]) != -1) clone.setAttribute("class", `status_${css} priority_${k} summary_${rowCounter}_${counter} tableButton leaveIt`);
-				else clone.setAttribute("class", `status_${css} priority_${k} summary_${rowCounter}_${counter} tableButton ${values[k]}`);
+				if(values[k] == 0) clone.setAttribute("class", `summary_${rowCounter}_${counter} cellDisabled`);
+				else if(keys.indexOf(values[k]) != -1) {
+					clone.setAttribute("class", `summary_${rowCounter}_${counter} tableButton leaveIt`);
+					clone.setAttribute("onclick", `filterTable("status_${css}", "priority_${k}")`)
+				}
+				else {
+					clone.setAttribute("class", `summary_${rowCounter}_${counter} tableButton ${values[k]}`);
+					clone.setAttribute("onclick", `filterTable("status_${css}", "priority_${k}")`)
+				}
 				clone.setAttribute("onmouseenter", `summaryTableCellOnMouseEnter(this)`);
 				clone.setAttribute("onmouseleave", `summaryTableCellOnMouseLeave(this)`);
 				counter += 1;
@@ -383,6 +445,21 @@
 			cell.setAttribute("class",  originalStyle);
 		}
 
+		function showAll(className){
+			Array.from(document.getElementsByClassName(className)).forEach(elem => elem.style.display = "table-row")
+		}
+
+		function hideAll(className){
+			Array.from(document.getElementsByClassName(className)).forEach(elem => elem.style.display = "none");
+		}
+
+		function filterTable(status, priority){
+			status_classes.forEach(s => showAll(s))
+			priority_classes.forEach(p => showAll(p));
+			if(status != "status_statusAll") status_classes.filter(s => s != status).forEach(s => hideAll(s));
+			if(priority != "priority_count") priority_classes.filter(p => p != priority).forEach(p => hideAll(p))
+		}
+
 		function generateSummaryRow(css, text, value){
 			let row = document.createElement("tr");
 			let data = document.createElement("td");
@@ -396,7 +473,7 @@
 			return row
 		}
 
-		function getDetectsDB(data){
+		function getDetectsCB(data){
 			let tableHeaders = ["ID", "Summary", "Priority", "EstimateDays", "Status", "Release version", "Assigned To", "Verified By", "Reported By"];
 			let counter_priority = {
 				"Highest": 0,
@@ -417,7 +494,7 @@
 
 			data.forEach(d => {
 				let table_tr = document.createElement("tr");
-				table_tr.setAttribute("class", statusClassMapper[d.status])
+				table_tr.setAttribute("class", `${statusClassMapper[d.status]} status_${statusClassMapper[d.status]} priority_${d.priority.toLowerCase()}`)
 				let table_tr_td = document.createElement("td");
 				let clone = table_tr_td.cloneNode(); table_tr.appendChild(clone); clone.setAttribute("class", statusClassMapper[d.status]); clone.appendChild(document.createTextNode(d._id))
 				clone = table_tr_td.cloneNode(); table_tr.appendChild(clone); clone.appendChild(document.createTextNode(d.summary));
