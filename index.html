@@ -1,193 +1,7 @@
 <html>
 <head>
 	<title>data.stack One page tracker</title>
-	<script type="text/javascript">
-		var d = document;
-		d.i = d.getElementById;
-		d.c = d.getElementsByClassName
-		
-		// --------- FOR USERS ---------------
-		var base_url = localStorage.getItem("base_url");
-		var username = localStorage.getItem("username");
-		var password = localStorage.getItem("password");
-		// --------- FOR USERS ---------------
-
-		var token = localStorage.getItem("token");
-		
-		function apiCaller(method, api, headers, urlParams, payload, cb) {
-			let constructedURL = `${base_url}${api}`;
-			let xhttp = new XMLHttpRequest();
-			
-			if (urlParams){
-				constructedURL += "?";
-				for(var key in urlParams){
-					if (key == "filter") constructedURL += `${key}=${JSON.stringify(urlParams[key])}&`;
-					else constructedURL += `${key}=${urlParams[key]}&`;
-				}
-			}
-			constructedURL = encodeURI(constructedURL)
-
-			xhttp.open(method, constructedURL, true);
-			xhttp.setRequestHeader("Content-type", "application/json");
-			if (token) {
-				xhttp.setRequestHeader("Authorization", `JWT ${token}`);
-			}
-
-			xhttp.onreadystatechange = function() {
-				if (this.readyState == 4) {
-					if(this.status == 200) {
-						if (api == "/api/a/rbac/login") {
-							let responseText = JSON.parse(this.responseText)
-							token = responseText.token
-							localStorage.setItem("token", token);
-							checkConfig();
-						}
-						else {
-							cb(JSON.parse(this.responseText))
-						}
-					} else if(this.status == 401) {
-						localStorage.removeItem("token");
-						token = null;
-						alert("Session expired. Please login again");
-						checkConfig();
-					} else {
-						alert(this.responseText)
-					}
-				}
-			};
-			if(payload) xhttp.send(JSON.stringify(payload));
-			else xhttp.send();
-		}
-	</script>
-
-	<style type="text/css">
-		.body{
-			font-family: monospace;
-			font-weight: lighter;
-			font-size: 13px;
-			margin: 0px;
-		}
-
-		.menu {
-			background-color: lightgrey;
-			display: block;
-			padding: 10px;
-			border-bottom: 1px solid black;
-		}
-
-		.data {
-			margin: 10px;
-		}
-
-		.config {
-			padding: 10px;
-			margin: 10rem auto;
-			border: 1px solid gray;
-			border-radius: 5px;
-			width: 325px;
-			display: block;
-			box-shadow: 2px 2px 4px lightgrey;
-			text-align: center;
-		}
-
-		.config label{
-			margin-right: 10px;
-			width: 75px;
-			display: inline-block;
-		}
-
-		.config button {
-			width: 75px;
-			height: 25px;
-			box-shadow: 2px 2px 4px lightgrey;
-		}
-
-		.dataTable {
-			width: 100%;
-			/*border: 1px solid black;*/
-			margin: 10px 0;
-		}
-
-		.dataTable td,
-		.dataTable th {
-			border: 1px solid gray;
-			padding: 2px 4px;
-		}
-
-		.statusSummary {
-			float: left;
-			margin: 10px 0;
-		}
-
-		.statusSummary td {
-			border: 1px solid lightgrey;
-			padding: 2px 4px;
-			width: 75px;
-		}
-
-		.statusSummary button {
-			width: 100%;
-		}
-
-		#statusSummary > tr:nth-child(2){
-			font-size: 15px;
-			font-weight: bold;
-			border: 1px solid black;
-		}
-
-		.statusAll {
-			width: 200px !important;
-		}
-
-		.tableButton {
-			cursor: pointer;
-		}
-		.tableButton:hover {
-			cursor: pointer;
-			box-shadow: 1px 1px 1px gray;
-			border-color: black;
-		}
-
-		.cellDisabled {
-			color: gray;
-		}
-
-		.highest{ background-color: indianred !important; color:  white !important;}
-		.high{ background-color: lightcoral !important; color:  black !important;}
-		.medium{ background-color: orange !important; color:  black !important;}
-		.low{ background-color: lightslategrey !important; color:  white !important;}
-		.lowest{ background-color: white !important; color:  black !important;}
-
-		.open { background-color: bisque; }
-		.inprogress {}
-		.readyforqa { background-color: lightgreen; }
-		.readyforrelease { background-color: lightskyblue; }
-		.rejected { text-decoration: line-through; color: gray; }
-		.cannotreproduce { text-decoration: line-through; color: gray;}
-		.workingasexpected { text-decoration: line-through; color: gray;}
-		.configurationissue { text-decoration: line-through; color: gray;}
-		.duplicate { text-decoration: line-through; color: gray;}
-		.closed { text-decoration: line-through; color: gray;}
-		.reopen { background-color:  lightcoral; }
-		.fixed { color: darkgreen; }
-		.readyforit { background-color: lightblue; }
-
-		.resetButton {
-			color: white;
-			background-color: slategray;
-		}
-
-		.logoutMessage {
-			padding: 10px;
-			background-color: lightcoral;
-			font-size: 13px;
-			border-radius: 2px;
-			box-shadow: 2px 2px 4px lightcoral;
-			margin: 20px;
-		}
-
-	</style>
-
+	<link rel="stylesheet" type="text/css" href="style.css">
 </head>
 <body class="body">
 
@@ -199,19 +13,41 @@
 		<p><button onclick="saveConfig()">Save</button></p>
 	</div>
 	
-	<div id="div-display">
-		<div id="div-menu" class="menu">
-			<label for="releases">Release</label>
-			<select name="releases" id="select_release">
-			</select>
-			<button id="button-vnext-defects" type="button" onclick="getDefects('vNext')">Defects</button>
-			<button id="button-login" type="button" class="resetButton" style="float:right;" onclick="reset()">Reset Config</button>
+	<div id="div-display" class="div-display">
+		
+		<div id="div-data" class="data">
+			<div class="data-control">
+				<div class="data-control-box">
+					<h2 style="text-align: center;">Release filters</h2>
+					<div id="data-releases" class="data-releases"></div>
+				</div>
+				<div class="statusSummary data-control-box">
+					<div class="statusfilters">
+						<button onclick="hideInvalid()">Hide invalid defects</button>
+					</div>
+					<table id="statusSummaryTable" class="statusSummaryTable"></table>
+				</div>
+				<div id="release-details" class="release-details">
+					<h2>Release: <span id="release-details-title"></span></h2>
+					<p>
+					</p>
+				</div>
+			</div>
+
+			<div id="flexDataTable" class="flexDataTable">
+				<div id="flexDataColumn1" class="flexDataColumn"></div>
+				<div id="flexDataColumn2" class="flexDataColumn"></div>
+				<div id="flexDataColumn3" class="flexDataColumn"></div>
+				<div id="flexDataColumn4" class="flexDataColumn"></div>
+				<div id="flexDataColumn5" class="flexDataColumn"></div>
+				<div id="flexDataColumn6" class="flexDataColumn"></div>
+				<div id="flexDataColumn7" class="flexDataColumn"></div>
+				<div id="flexDataColumn8" class="flexDataColumn"></div>
+			</div>
 		</div>
 
-		<div id="div-data" class="data">
-			<table id="statusSummary" class="statusSummary"></table>
-			<table id="table" class="dataTable">
-			</table>
+		<div id="div-menu" class="menu">
+			<button id="button-login" type="button" class="resetButton" style="float:right;" onclick="reset()">Reset Config</button>
 		</div>
 	</div>
 
@@ -221,298 +57,8 @@
 		<button id="button-login" type="button" class="resetButton" onclick="reset()">Reset</button>
 	</div>
 
-	<script type="text/javascript">
-
-		const statusClassMapper = {
-			"Open": "open",
-			"In Progress": "inprogress",
-			"Ready for QA": "readyforqa",
-			"Ready for Release": "readyforrelease",
-			"Rejected": "rejected",
-			"Cannot Reproduce": "cannotreproduce",
-			"Working as Expected": "workingasexpected",
-			"Configuration Issue": "configurationissue",
-			"Duplicate": "duplicate",
-			"Closed": "closed",
-			"Re-Open": "reopen",
-			"Fixed": "fixed",
-			"Ready for I&T": "readyforit",
-			"Status": "status",
-			"Total": "total",
-		};
-
-		const status_classes = ["status_open", "status_inprogress", "status_readyforqa", "status_readyforrelease", "status_rejected", "status_cannotreproduce", "status_workingasexpected", "status_configurationissue", "status_duplicate", "status_closed", "status_reopen", "status_fixed", "status_readyforit"];
-
-		const priority_classes = ["priority_highest", "priority_high", "priority_medium", "priority_low", "priority_lowest"];
-
-		var releases = null;
-
-
-		var RELEASE = "REL1011";
-
-		var statusSummary = d.i("statusSummary");
-		var table = d.i("table");
-
-		function checkConfig(){
-			let div_display = d.i("div-display");
-			let div_login = d.i("div_login");
-			let div_config = d.i("div_config");
-			div_display.style.display = "none";
-			div_login.style.display = "none";
-			div_config.style.display = "none";
-			if(token){
-				div_display.style.display = "block";
-				getReleases();
-			} else if(!base_url || !username || !password) {
-				localStorage.removeItem("token");
-				localStorage.removeItem("base_url");
-				localStorage.removeItem("username");
-				localStorage.removeItem("password");
-				div_config.style.display = "block";
-			} else {
-				div_login.style.display = "block";
-			}
-		}
-		checkConfig()
-
-		function saveConfig(){
-			base_url = d.i("input_url").value;
-			username = d.i("input_username").value;
-			password = d.i("input_password").value;
-			localStorage.setItem("base_url", base_url);
-			localStorage.setItem("username", username);
-			localStorage.setItem("password", password);
-			checkConfig();
-		}
-
-		function reset(){
-			localStorage.removeItem("token");
-			localStorage.removeItem("base_url");
-			localStorage.removeItem("username");
-			localStorage.removeItem("password");
-			checkConfig();
-		}
-
-		function login(){
-			let data = {username, password};
-			apiCaller("POST", "/api/a/rbac/login", null, null, data, getReleases)
-		}
-
-		function generateFilter(release){
-			return {"$and":[{"$or":[{"releaseVersion._id":`/${release}/`},{"releaseVersion.releaseVersion":`/${release}/`}]}]}
-		}
-
-		function getReleases(){
-			let select = "_id,releaseVersion,plannedReleaseDate,released";
-			let count = 10000;
-			let sort = "releaseVersion";
-			apiCaller("GET", "/api/c/data-stack/release", null, {select, sort, count}, null, getReleasesCB)
-		}
-
-		function getReleasesCB(data){
-			releases = data;
-			let select = d.i("select_release");
-			let option = document.createElement('option');
-			let selectedIndex = 0;
-			releases.forEach((release, index) => {
-				let clone = option.cloneNode();
-				clone.value = release._id;
-				if(release._id == RELEASE) selectedIndex = index;
-				clone.innerHTML = release.releaseVersion;
-				select.appendChild(clone);
-			})
-			select.selectedIndex = selectedIndex;
-		}
-
-		function getDefects(){
-			let input_select = d.i("select_release");
-			// let filter = generateFilter(input_select.value);
-			RELEASE = input_select.value;
-			let filter = {"releaseVersion._id":`/${input_select.value}/`};
-			let select = "_id,summary,priority,estimateDays,status,releaseVersion.releaseVersion,assignedTo._id,verifiedBy._id,reportedBy._id";
-			let count = 10000;
-			let sort = "priority";
-			apiCaller("GET", "/api/c/data-stack/defects", null, {filter, select, sort, count}, null, getDetectsCB)
-		}
-
-		function getDefectPriorityAggregation(){
-			let aggregationPipeline = [{"$match": {"releaseVersion._id": RELEASE}},{"$group": {"_id": "$priority","count": {"$sum": 1}}},{"$sort": {"_id": 1}}];
-			apiCaller("POST", "/api/c/data-stack/defects/utils/aggregate", null, null, aggregationPipeline, getDefectPriorityAggregationCB)
-		}
-
-		function getDefectPriorityAggregationCB(data){
-			let counter = {"highest": 0,"high": 0,"medium": 0,"low": 0,"lowest": 0};
-			let count = 0;
-			data.forEach(d => {
-				counter[d._id.toLowerCase()] = d.count;
-				count += d.count;
-			});
-			
-			statusSummary.innerHTML = "";
-			statusSummary.appendChild(generateStatusSummaryRow("statusAll", 1, "Status", {"count":"Count", "highest":"Highest", "high":"High", "medium":"Medium", "low":"Low", "lowest":"Lowest"}))
-			statusSummary.appendChild(generateStatusSummaryRow("statusAll", 2, "Total", {...counter, ...{count}}))
-			getDefectStatusAggregation()
-		}
-
-		function getDefectStatusAggregation(){
-			let aggregationPipeline = [{"$match": {"releaseVersion._id": RELEASE}},{"$group": {"_id": "$status","count": {"$sum": 1},"high": {"$sum": {"$cond": {"else": 0,"if": {"$eq": ["$priority","High"]},"then": 1}}},"highest": {"$sum": {"$cond": {"else": 0,"if": {"$eq": ["$priority","Highest"]},"then": 1}}},"low": {"$sum": {"$cond": {"else": 0,"if": {"$eq": ["$priority","Low"]},"then": 1}}},"lowest": {"$sum": {"$cond": {"else": 0,"if": {"$eq": ["$priority","Lowest"]},"then": 1}}},"medium": {"$sum": {"$cond": {"else": 0,"if": {"$eq": ["$priority","Medium"]},"then": 1}}}}},{"$sort": {"_id": 1}}]
-			apiCaller("POST", "/api/c/data-stack/defects/utils/aggregate", null, null, aggregationPipeline, getDefectStatusAggregationCB)
-		}
-
-		function generateDummyEntry(_id){
-			return {"_id": _id, "count": 0, "highest": 0,"high": 0,"medium": 0,"low": 0,"lowest": 0}
-		}
-
-		function getDefectStatusAggregationCB(data){
-			let newData = [
-				data.filter(d => d._id=="Open")[0] || generateDummyEntry("Open"),
-				data.filter(d => d._id=="Re-Open")[0] || generateDummyEntry("Re-Open"),
-				data.filter(d => d._id=="In Progress")[0] || generateDummyEntry("In Progress"),
-				data.filter(d => d._id=="Fixed")[0] || generateDummyEntry("Fixed"),
-				data.filter(d => d._id=="Ready for QA")[0] || generateDummyEntry("Ready for QA"),
-				data.filter(d => d._id=="Ready for I&T")[0] || generateDummyEntry("Ready for I&T"),
-				data.filter(d => d._id=="Ready for Release")[0] || generateDummyEntry("Ready for Release"),
-				data.filter(d => d._id=="Closed")[0] || generateDummyEntry("Closed"),
-				data.filter(d => d._id=="Cannot Reproduce")[0] || generateDummyEntry("Cannot Reproduce"),
-				data.filter(d => d._id=="Configuration Issue")[0] || generateDummyEntry("Configuration Issue"),
-				data.filter(d => d._id=="Duplicate")[0] || generateDummyEntry("Duplicate"),
-				data.filter(d => d._id=="Rejected")[0] || generateDummyEntry("Rejected"),
-				data.filter(d => d._id=="Working as Expected")[0] || generateDummyEntry("Working as Expected"),
-			];
-			let i = 3;
-			newData.forEach(d => {
-				statusSummary.appendChild(generateStatusSummaryRow(statusClassMapper[d._id], i, d._id, d));
-				i += 1;
-			})
-		}
-
-		function generateStatusSummaryRow(css, rowCounter, text, values){
-			let keys = ["count", "highest", "high", "medium", "low", "lowest"];
-			let row = document.createElement("tr");
-			row.setAttribute("class", `summary_${rowCounter}`);
-			let data = document.createElement("td");
-			let button = document.createElement("button");
-			let clone_text = data.cloneNode();
-			row.appendChild(clone_text);
-			clone_text.setAttribute("class", `${css} tableButton`);
-			clone_text.appendChild(document.createTextNode(text))
-			clone_text.setAttribute("onclick", `filterTable("status_${css}", "priority_count")`)
-			let counter = 0;
-			keys.forEach(k => {
-				let clone = data.cloneNode();
-				row.appendChild(clone);
-				if(values[k] == 0) clone.setAttribute("class", `summary_${rowCounter}_${counter} cellDisabled`);
-				else if(keys.indexOf(values[k]) != -1) {
-					clone.setAttribute("class", `summary_${rowCounter}_${counter} tableButton leaveIt`);
-					clone.setAttribute("onclick", `filterTable("status_${css}", "priority_${k}")`)
-				}
-				else {
-					clone.setAttribute("class", `summary_${rowCounter}_${counter} tableButton ${values[k]}`);
-					clone.setAttribute("onclick", `filterTable("status_${css}", "priority_${k}")`)
-				}
-				clone.setAttribute("onmouseenter", `summaryTableCellOnMouseEnter(this)`);
-				clone.setAttribute("onmouseleave", `summaryTableCellOnMouseLeave(this)`);
-				counter += 1;
-				clone.appendChild(document.createTextNode(values[k]))
-			});
-			return row
-		}
-
-		let originalStyle = null
-
-		function summaryTableCellOnMouseEnter(cellRef){
-			let cellClass = cellRef.getAttribute("class");
-			let styles = cellClass.split(" ")[0].split("_");
-			let rowClass = `${styles[0]}_${styles[1]}`;
-			originalStyle = cellClass;
-			d.c(rowClass)[0].style.backgroundColor = "powderblue";
-			let cell = d.c(cellClass)[0];
-			if(cellClass.indexOf("tableButton") != -1 && cellClass.indexOf("leaveIt") == -1) {
-				cell.style.backgroundColor = "steelblue";
-				cell.style.color = "white";
-			}
-		}
-		
-		function summaryTableCellOnMouseLeave(cellRef){
-			let cellClass = cellRef.getAttribute("class");
-			let styles = cellClass.split(" ")[0].split("_");
-			let rowClass = `${styles[0]}_${styles[1]}`;
-			d.c(rowClass)[0].style.backgroundColor = "white";
-			let cell = d.c(cellClass)[0]
-			if(cellClass.indexOf("tableButton") != -1 && cellClass.indexOf("leaveIt") == -1) {
-				cell.style.backgroundColor = "white";
-				cell.style.color = "black";
-			}
-			cell.setAttribute("class",  originalStyle);
-		}
-
-		function showAll(className){
-			Array.from(d.c(className)).forEach(elem => elem.style.display = "table-row")
-		}
-
-		function hideAll(className){
-			Array.from(d.c(className)).forEach(elem => elem.style.display = "none");
-		}
-
-		function filterTable(status, priority){
-			status_classes.forEach(s => showAll(s))
-			priority_classes.forEach(p => showAll(p));
-			if(status != "status_statusAll") status_classes.filter(s => s != status).forEach(s => hideAll(s));
-			if(priority != "priority_count") priority_classes.filter(p => p != priority).forEach(p => hideAll(p))
-		}
-
-		function generateSummaryRow(css, text, value){
-			let row = document.createElement("tr");
-			let data = document.createElement("td");
-			let clone1 = data.cloneNode();
-			let clone2 = data.cloneNode();
-			row.appendChild(clone1);
-			row.appendChild(clone2);
-			clone1.setAttribute("class", css);
-			clone1.appendChild(document.createTextNode(text))
-			clone2.appendChild(document.createTextNode(value));
-			return row
-		}
-
-		function getDetectsCB(data){
-			let tableHeaders = ["ID", "Summary", "Priority", "EstimateDays", "Status", "Release version", "Assigned To", "Verified By", "Reported By"];
-			let counter_priority = {
-				"Highest": 0,
-				"High": 0,
-				"Medium": 0,
-				"Low": 0,
-				"Lowest": 0,
-			};
-
-			table.innerHTML = "";
-			let table_tr = document.createElement("tr");
-			tableHeaders.forEach(header => {
-				let table_tr_th = document.createElement("th");
-				table_tr_th.appendChild(document.createTextNode(header))
-				table_tr.appendChild(table_tr_th);
-			});
-			table.appendChild(table_tr);
-
-			data.forEach(d => {
-				let table_tr = document.createElement("tr");
-				table_tr.setAttribute("class", `${statusClassMapper[d.status]} status_${statusClassMapper[d.status]} priority_${d.priority.toLowerCase()}`)
-				let table_tr_td = document.createElement("td");
-				let clone = table_tr_td.cloneNode(); table_tr.appendChild(clone); clone.setAttribute("class", statusClassMapper[d.status]); clone.appendChild(document.createTextNode(d._id))
-				clone = table_tr_td.cloneNode(); table_tr.appendChild(clone); clone.appendChild(document.createTextNode(d.summary));
-				clone = table_tr_td.cloneNode(); table_tr.appendChild(clone); clone.setAttribute("class", d.priority.toLowerCase()); clone.appendChild(document.createTextNode(d.priority));
-				clone = table_tr_td.cloneNode(); table_tr.appendChild(clone); clone.appendChild(document.createTextNode(d.estimateDays || "-nil-"));
-				clone = table_tr_td.cloneNode(); table_tr.appendChild(clone); clone.appendChild(document.createTextNode(d.status));
-				clone = table_tr_td.cloneNode(); table_tr.appendChild(clone); clone.appendChild(document.createTextNode(d.releaseVersion?.releaseVersion || "-nil-"));
-				clone = table_tr_td.cloneNode(); table_tr.appendChild(clone); clone.appendChild(document.createTextNode(d.assignedTo?._id || "-nil-"));
-				clone = table_tr_td.cloneNode(); table_tr.appendChild(clone); clone.appendChild(document.createTextNode(d.verifiedBy?._id || "-nil-"));
-				clone = table_tr_td.cloneNode(); table_tr.appendChild(clone); clone.appendChild(document.createTextNode(d.reportedBy._id || "-nil-"));
-				table_tr.appendChild(clone);
-				table.appendChild(table_tr);
-			});
-		getDefectPriorityAggregation();
-		}
-		
-	</script>
+	<script src="lib.js"></script>
+	<script src="main.js"></script>
 
 </body>
 </html>

@@ -1,0 +1,236 @@
+
+.body{
+	font-family: monospace;
+	font-weight: lighter;
+	font-size: 13px;
+	margin: 0px;
+}
+
+.menu {
+	background-color: lightgrey;
+	display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: flex-end;
+  align-items: flex-end;
+  align-content: normal;
+	padding: 10px;
+	border-bottom: 1px solid black;
+}
+
+.data {
+	margin: 10px;
+	display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  justify-content: normal;
+  align-items: normal;
+  align-content: normal;
+}
+
+.config {
+	padding: 10px;
+	margin: 10rem auto;
+	border: 1px solid gray;
+	border-radius: 5px;
+	width: 325px;
+	display: block;
+	box-shadow: 2px 2px 4px lightgrey;
+	text-align: center;
+}
+
+.config label{
+	margin-right: 10px;
+	width: 75px;
+	display: inline-block;
+}
+
+.config button {
+	width: 75px;
+	height: 25px;
+	box-shadow: 2px 2px 4px lightgrey;
+}
+
+.div-display {
+	display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+  align-items: stretch;
+  align-content: normal
+}
+
+.dataTable {
+	width: 100%;
+	/*border: 1px solid black;*/
+	margin: 10px 0;
+}
+
+.dataTable td,
+.dataTable th {
+	border: 1px solid gray;
+	padding: 2px 4px;
+}
+
+.data-control {
+  display: inline-flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: normal;
+  /*justify-content: space-between;*/
+  align-items: normal;
+  align-content: normal;
+}
+
+.data-control-box {
+	border: 1px solid lightgrey;
+  /*box-shadow: 2px 2px 4px lightgrey;*/
+  padding: 5px;
+	margin: 10px;
+}
+
+.data-releases {
+	display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  justify-content: normal;
+  align-items: normal;
+  align-content: normal;
+  height: 250px;
+  width: 250px;
+}
+
+.data-releases button {
+	margin: 2px;
+	display: flex;
+	width: 115px;
+  height: 25px;
+	line-height: 20px;
+	text-align: center;
+}
+
+.data-releases .specialButton {
+	color: Green;
+	font-weight: bold;
+}
+
+.release-details {
+	margin-left: 20px;
+}
+
+.statusSummaryTable {
+	margin: 10px 0;
+	display: block;
+  flex-grow: 0;
+  height: 350px;
+}
+
+.statusSummaryTable td {
+	border: 1px solid lightgrey;
+	padding: 2px 4px;
+	width: 75px;
+}
+
+.statusSummaryTable button {
+	width: 100%;
+}
+
+#statusSummaryTable > tr:nth-child(2){
+	font-size: 15px;
+	font-weight: bold;
+	border: 1px solid black;
+}
+
+.statusAll {
+	width: 200px !important;
+}
+
+.tableButton {
+	cursor: pointer;
+}
+.tableButton:hover {
+	cursor: pointer;
+	box-shadow: 1px 1px 1px gray;
+	border-color: black;
+}
+
+.tableButton2 {
+	cursor: pointer;
+	height: 20px;
+	overflow: hidden;
+	border: 1px solid white;
+	padding: 1px 2px;
+	margin: 1px 0px;
+	word-wrap: break-word;
+}
+
+.tableButton2:hover {
+	cursor: pointer;
+	border: 1px solid black;
+	box-shadow: 1px 1px 1px gray;
+}
+
+.flexDataTable {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: center;
+  align-items: normal;
+  align-content: normal;
+}
+
+.flexDataColumn{
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  justify-content: normal;
+  align-items: normal;
+  align-content: normal;
+  margin: 2px;
+}
+
+.flexDataColumn .columnHeader {
+	border: 1px solid gray;
+	padding: 2px 4px;
+	height: 35px;
+	vertical-align: middle;
+	margin-bottom: 2px;
+}
+
+.cellDisabled {
+	color: gray;
+}
+
+.highest{ background-color: indianred !important; color:  white !important;}
+.high{ background-color: lightcoral !important; color:  black !important;}
+.medium{ background-color: orange !important; color:  black !important;}
+.low{ background-color: lightslategrey !important; color:  white !important;}
+.lowest{ background-color: white !important; color:  black !important;}
+
+.open { background-color: bisque; }
+.inprogress {}
+.readyforqa { background-color: lightgreen; }
+.readyforrelease { background-color: lightskyblue; }
+.rejected { text-decoration: line-through; color: gray; }
+.cannotreproduce { text-decoration: line-through; color: gray;}
+.workingasexpected { text-decoration: line-through; color: gray;}
+.configurationissue { text-decoration: line-through; color: gray;}
+.duplicate { text-decoration: line-through; color: gray;}
+.closed { text-decoration: line-through; color: gray;}
+.reopen { background-color:  lightcoral; }
+.fixed { color: darkgreen; }
+.readyforit { background-color: lightblue; }
+
+.resetButton {
+	color: white;
+	background-color: slategray;
+}
+
+.logoutMessage {
+	padding: 10px;
+	background-color: lightcoral;
+	font-size: 13px;
+	border-radius: 2px;
+	box-shadow: 2px 2px 4px lightcoral;
+	margin: 20px;
+}
