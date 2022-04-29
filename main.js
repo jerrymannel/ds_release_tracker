@@ -16,6 +16,8 @@ const statusClassMapper = {
 	"Total": "total",
 };
 
+const PRIORITY = ["highest", "high", "medium", "low", "lowest"];
+
 const status_classes = ["status_open", "status_inprogress", "status_readyforqa", "status_readyforrelease", "status_rejected", "status_cannotreproduce", "status_workingasexpected", "status_configurationissue", "status_duplicate", "status_closed", "status_reopen", "status_fixed", "status_readyforit"];
 
 const default_hidden_classes = ["status_closed", "status_cannotreproduce", "status_configurationissue", "status_duplicate", "status_rejected", "status_workingasexpected"];
@@ -32,14 +34,14 @@ var RELEASE = "REL1011";
 var statusSummaryTable = d.i("statusSummaryTable");
 
 function checkConfig(){
-	let div_display = d.i("div-display");
-	let div_login = d.i("div_login");
-	let div_config = d.i("div_config");
-	div_display.style.display = "none";
-	div_login.style.display = "none";
-	div_config.style.display = "none";
+	// let div_display = d.i("div-display");
+	// let div_login = d.i("div_login");
+	// let div_config = d.i("div_config");
+	// div_display.style.display = "none";
+	// div_login.style.display = "none";
+	// div_config.style.display = "none";
 	if(token){
-		div_display.style.display = "block";
+		// div_display.style.display = "flex";
 		getReleases();
 	} else if(!base_url || !username || !password) {
 		localStorage.removeItem("token");
@@ -51,7 +53,6 @@ function checkConfig(){
 		div_login.style.display = "block";
 	}
 }
-checkConfig()
 
 function saveConfig(){
 	base_url = d.i("input_url").value;
@@ -86,21 +87,31 @@ function getReleases(){
 	let sort = "releaseVersion";
 	apiCaller("GET", "/api/c/data-stack/release", null, {select, sort, count}, null, getReleasesCB)
 }
+getReleases();
 
 function getReleasesCB(data){
 	releases = data;
 	let dataMenuReleases = d.i("data-releases");
 	dataMenuReleases.innerHTML = "";
 	let button = document.createElement("button");
+	button.setAttribute("class", "btn btn-sm btn-dark text-light");
+	button.innerHTML = "vNext";
+	button.addEventListener("click", () => getDefects("REL1011", "vNext"));
+	dataMenuReleases.appendChild(button);
 	releases.forEach((release, index) => {
 		let clone = button.cloneNode();
 		clone.innerHTML = release.releaseVersion;
+		clone.setAttribute("class", "btn btn-sm btn-light");
 		clone.addEventListener("click", () => getDefects(release._id, release.releaseVersion));
-		if (release.releaseVersion == "vNext" || release.releaseVersion == "Backlog") {
-			clone.setAttribute("class", "specialButton");
+		if (release.releaseVersion != "vNext" && release.releaseVersion != "Backlog") {
+			dataMenuReleases.appendChild(clone);
 		}
-		dataMenuReleases.appendChild(clone);
-	})
+	});
+	let clone = button.cloneNode();
+	clone.addEventListener("click", () => getDefects("REL1011", "vNext"));
+	clone.innerHTML = "Backlog";
+	clone.addEventListener("click", () => getDefects("REL1005", "Backlog"));
+	dataMenuReleases.appendChild(clone);
 	getDefects("REL1011", "vNext");
 }
 
@@ -130,7 +141,8 @@ function getDefectPriorityAggregationCB(data){
 	statusSummaryTable.innerHTML = "";
 	statusSummaryTable.appendChild(generateStatusSummaryRow("statusAll", 1, "Status", {"count":"Count", "highest":"Highest", "high":"High", "medium":"Medium", "low":"Low", "lowest":"Lowest"}))
 	statusSummaryTable.appendChild(generateStatusSummaryRow("statusAll", 2, "Total", {...counter, ...{count}}))
-	getDefectStatusAggregation()
+	getDefectStatusAggregation();
+	getDevTeamDefectStatusAggregation();
 }
 
 function getDefectStatusAggregation(){
@@ -197,8 +209,16 @@ function generateStatusSummaryRow(css, rowCounter, text, values){
 	return row
 }
 
-let originalStyle = null
+function getDevTeamDefectStatusAggregation(){
+	let aggregationPipeline = [{"$match":{"releaseVersion._id": RELEASE,"status":{"$in":["Open","Re-Open","In Progress"]}}},{"$group":{"_id":"$assignedTo._id","count":{"$sum":1},"high":{"$sum":{"$cond":{"else":0,"if":{"$eq":["$priority","High"]},"then":1}}},"highest":{"$sum":{"$cond":{"else":0,"if":{"$eq":["$priority","Highest"]},"then":1}}},"low":{"$sum":{"$cond":{"else":0,"if":{"$eq":["$priority","Low"]},"then":1}}},"lowest":{"$sum":{"$cond":{"else":0,"if":{"$eq":["$priority","Lowest"]},"then":1}}},"medium":{"$sum":{"$cond":{"else":0,"if":{"$eq":["$priority","Medium"]},"then":1}}}}},{"$sort":{"_id":1}}]
+	apiCaller("POST", "/api/c/data-stack/defects/utils/aggregate", null, null, aggregationPipeline, getDevTeamDefectStatusAggregationCB)
+}
 
+function getDevTeamDefectStatusAggregationCB(data) {
+	console.log(data);
+}
+
+let originalStyle = null
 function summaryTableCellOnMouseEnter(cellRef){
 	let cellClass = cellRef.getAttribute("class");
 	let styles = cellClass.split(" ")[0].split("_");
@@ -259,12 +279,55 @@ function generateSummaryRow(css, text, value){
 	return row
 }
 
+function generateDetailDev(key, value){
+	let div = document.createElement("div");
+	let divKey = document.createElement("div");
+	divKey.setAttribute("class", "key");
+	divKey.innerHTML = key;
+	let divValue = document.createElement("div");
+	divValue.setAttribute("class", "value");
+	if(typeof value == "object" && value){
+		let ol = document.createElement("ol")
+		let li = document.createElement("li");
+		value.forEach(v => {
+			let clone = li.cloneNode();
+			clone.innerHTML = v;
+			ol.appendChild(clone);
+		})
+		divValue.appendChild(ol);
+	}
+	else divValue.innerHTML = value;
+	if(key == "Priority") div.setAttribute("class", `${value.toLowerCase()}`);
+	if(key == "Status") div.setAttribute("class", `${statusClassMapper[value]}`);
+	div.appendChild(divKey);
+	div.appendChild(divValue);
+	return div;
+}
+
+var details = d.i("details");
+details.innerHTML = "";
+function showDetails(data){
+	details.innerHTML = "";
+	details.appendChild(generateDetailDev("ID", data._id));
+	details.appendChild(generateDetailDev("Status", data.status));
+	details.appendChild(generateDetailDev("Priority", data.priority));
+	details.appendChild(generateDetailDev("Summary", data.summary));
+	details.appendChild(generateDetailDev("Reported By", data.reportedBy._id));
+	details.appendChild(generateDetailDev("Assigned To", data.assignedTo._id));
+	details.appendChild(generateDetailDev("Description", data.description));
+	details.appendChild(generateDetailDev("Comments", data.comments));
+}
+
 function generateFlexDataTableCell(id, d, status, priority) {
 	let div = document.createElement("div");
 	div.setAttribute("class", `${id} tableButton2 ${statusClassMapper[status]} status_${statusClassMapper[status]} priority_${priority.toLowerCase()}`)
+	if(PRIORITY.indexOf(d.toLowerCase()) != -1)
+		div.setAttribute("class", `${id} tableButton2 ${statusClassMapper[status]} status_${statusClassMapper[status]} priority_${priority.toLowerCase()} ${priority.toLowerCase()}`)
 	div.setAttribute("onmouseenter", `flexDataMouseEnter("${id}")`);
 	div.setAttribute("onmouseleave", `flexDataMouseLeave("${id}")`);
-	div.innerHTML = d;
+	div.addEventListener("click", () => apiCaller("GET", `/api/c/data-stack/defects/${id}`, null, null, null, showDetails));
+	if(d.indexOf("@") == -1 ) div.innerHTML = d;
+	else div.innerHTML = d.replace("@appveen.com", "");
 	return div;
 }
 
@@ -290,10 +353,9 @@ var flexDataColumn4 = d.i("flexDataColumn4");
 var flexDataColumn5 = d.i("flexDataColumn5");
 var flexDataColumn6 = d.i("flexDataColumn6");
 var flexDataColumn7 = d.i("flexDataColumn7");
-var flexDataColumn8 = d.i("flexDataColumn8");
 
 function getDetectsCB(data){
-	let tableHeaders = ["ID", "Summary", "Priority", "Status", "Release version", "Assigned To", "Verified By", "Reported By"];
+	let tableHeaders = ["ID", "Summary", "Priority", "Status", "Assigned To", "Verified By", "Reported By"];
 	let counter_priority = {
 		"Highest": 0,
 		"High": 0,
@@ -307,21 +369,19 @@ function getDetectsCB(data){
 	flexDataColumn2.innerHTML = `<div class="columnHeader">Summary</div>`;
 	flexDataColumn3.innerHTML = `<div class="columnHeader">Priority</div>`;
 	flexDataColumn4.innerHTML = `<div class="columnHeader">Status</div>`;
-	flexDataColumn5.innerHTML = `<div class="columnHeader">Release version</div>`;
-	flexDataColumn6.innerHTML = `<div class="columnHeader">Assigned To</div>`;
-	flexDataColumn7.innerHTML = `<div class="columnHeader">Verified By</div>`;
-	flexDataColumn8.innerHTML = `<div class="columnHeader">Reported By</div>`;
+	flexDataColumn5.innerHTML = `<div class="columnHeader">Assigned To</div>`;
+	flexDataColumn6.innerHTML = `<div class="columnHeader">Verified By</div>`;
+	flexDataColumn7.innerHTML = `<div class="columnHeader">Reported By</div>`;
 
 	let div = document.createElement("div");
 	data.forEach(d => {
-	flexDataColumn1.appendChild(generateFlexDataTableCell(d._id, d._id, d.status, d.priority));
-	flexDataColumn2.appendChild(generateFlexDataTableCell(d._id, d.summary, d.status, d.priority));
-	flexDataColumn3.appendChild(generateFlexDataTableCell(d._id, d.priority, d.status, d.priority));
-	flexDataColumn4.appendChild(generateFlexDataTableCell(d._id, d.status, d.status, d.priority));
-	flexDataColumn5.appendChild(generateFlexDataTableCell(d._id, d.releaseVersion?.releaseVersion || "-nil-", d.status, d.priority));
-	flexDataColumn6.appendChild(generateFlexDataTableCell(d._id, d.assignedTo?._id || "-nil-", d.status, d.priority));
-	flexDataColumn7.appendChild(generateFlexDataTableCell(d._id, d.verifiedBy?._id || "-nil-", d.status, d.priority));
-	flexDataColumn8.appendChild(generateFlexDataTableCell(d._id, d.reportedBy?._id || "-nil-", d.status, d.priority));
+		flexDataColumn1.appendChild(generateFlexDataTableCell(d._id, d._id, d.status, d.priority));
+		flexDataColumn2.appendChild(generateFlexDataTableCell(d._id, d.summary, d.status, d.priority));
+		flexDataColumn3.appendChild(generateFlexDataTableCell(d._id, d.priority, d.status, d.priority));
+		flexDataColumn4.appendChild(generateFlexDataTableCell(d._id, d.status, d.status, d.priority));
+		flexDataColumn5.appendChild(generateFlexDataTableCell(d._id, d.assignedTo?._id || "-nil-", d.status, d.priority));
+		flexDataColumn6.appendChild(generateFlexDataTableCell(d._id, d.verifiedBy?._id || "-nil-", d.status, d.priority));
+		flexDataColumn7.appendChild(generateFlexDataTableCell(d._id, d.reportedBy?._id || "-nil-", d.status, d.priority));
 	});
-getDefectPriorityAggregation();
+	getDefectPriorityAggregation();
 }

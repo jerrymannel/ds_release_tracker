@@ -44,7 +44,8 @@ function apiCaller(method, api, headers, urlParams, payload, cb) {
 			} else if(this.status == 401) {
 				localStorage.removeItem("token");
 				token = null;
-				checkConfig();
+				// checkConfig();
+				login();
 			} else {
 				alert(this.responseText)
 			}

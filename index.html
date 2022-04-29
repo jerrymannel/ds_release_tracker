@@ -1,61 +1,90 @@
 <html>
 <head>
 	<title>data.stack One page tracker</title>
+	<link rel="stylesheet" type="text/css" href="bootstrap.min.css">
 	<link rel="stylesheet" type="text/css" href="style.css">
 </head>
 <body class="body">
 
-	<div class="config" id="div_config">
+	<nav class="navbar navbar-dark bg-dark">
+		<div class="container-fluid">
+			<span id="release-details-title" class="navbar-brand mb-0 h1">Navbar</span>
+		</div>
+	</nav>
+
+	<div class="d-flex flex-row align-items-stretch mt-2">
+
+		<div class="p-1 border-end menu shadow">
+			<div id="data-releases" class="d-grid gap-2"></div>
+		</div>
+
+		<div class="ms-1 p-1 d-flex flex-column">
+			<div class="d-flex flex-row">
+				<div class="card p-2 shadow menu">
+					<button onclick="hideInvalid()" class="btn btn-sm btn-secondary">Hide invalid defects</button>
+				</div>
+				<div class="card p-2 mx-2 shadow">
+					<table id="statusSummaryTable" class="statusSummaryTable"></table>
+				</div>
+				<div class="card p-2 shadow">
+				</div>
+			</div>
+
+			<div class="card p-2 mt-2 shadow">
+				<div id="flexDataTable" class="flexDataTable">
+					<div id="flexDataColumn1" class="flexDataColumn"></div>
+					<div id="flexDataColumn2" class="flexDataColumn"></div>
+					<div id="flexDataColumn3" class="flexDataColumn"></div>
+					<div id="flexDataColumn4" class="flexDataColumn"></div>
+					<div id="flexDataColumn5" class="flexDataColumn"></div>
+					<div id="flexDataColumn6" class="flexDataColumn"></div>
+					<div id="flexDataColumn7" class="flexDataColumn"></div>
+				</div>
+			</div>
+
+		</div>
+
+	</div>
+
+	<!-- <div class="config" id="div_config">
 		<h3>Set Config</h3>
 		<p><label>URL</label><input id="input_url" type="text" name="URL" size="30"></p>
 		<p><label>Username</label><input id="input_username" type="text" name="Username" size="30"></p>
 		<p><label>Password</label><input id="input_password" type="password" name="Password" size="30"></p>
 		<p><button onclick="saveConfig()">Save</button></p>
-	</div>
+	</div> -->
 	
 	<div id="div-display" class="div-display">
-		
+
 		<div id="div-data" class="data">
 			<div class="data-control">
-				<div class="data-control-box">
-					<h2 style="text-align: center;">Release filters</h2>
-					<div id="data-releases" class="data-releases"></div>
-				</div>
-				<div class="statusSummary data-control-box">
-					<div class="statusfilters">
-						<button onclick="hideInvalid()">Hide invalid defects</button>
-					</div>
-					<table id="statusSummaryTable" class="statusSummaryTable"></table>
+				<div class="statusSummary"></div>
+				<div id="teamOpenSummary" class="flexDataTable">
+					<div id="teamOpenSummaryCol1" class="flexDataColumn"></div>
+					<div id="teamOpenSummaryCol2" class="flexDataColumn"></div>
+					<div id="teamOpenSummaryCol3" class="flexDataColumn"></div>
+					<div id="teamOpenSummaryCol4" class="flexDataColumn"></div>
+					<div id="teamOpenSummaryCol5" class="flexDataColumn"></div>
+					<div id="teamOpenSummaryCol6" class="flexDataColumn"></div>
+					<div id="teamOpenSummaryCol7" class="flexDataColumn"></div>
 				</div>
 				<div id="release-details" class="release-details">
-					<h2>Release: <span id="release-details-title"></span></h2>
-					<p>
-					</p>
+					<div class="details" id="details"></div>
 				</div>
 			</div>
 
-			<div id="flexDataTable" class="flexDataTable">
-				<div id="flexDataColumn1" class="flexDataColumn"></div>
-				<div id="flexDataColumn2" class="flexDataColumn"></div>
-				<div id="flexDataColumn3" class="flexDataColumn"></div>
-				<div id="flexDataColumn4" class="flexDataColumn"></div>
-				<div id="flexDataColumn5" class="flexDataColumn"></div>
-				<div id="flexDataColumn6" class="flexDataColumn"></div>
-				<div id="flexDataColumn7" class="flexDataColumn"></div>
-				<div id="flexDataColumn8" class="flexDataColumn"></div>
-			</div>
 		</div>
 
-		<div id="div-menu" class="menu">
-			<button id="button-login" type="button" class="resetButton" style="float:right;" onclick="reset()">Reset Config</button>
-		</div>
 	</div>
+	<!-- <div id="div-menu" class="menu">
+		<button id="button-login" type="button" class="resetButton" style="float:right;" onclick="reset()">Reset Config</button>
+	</div> -->
 
-	<div class="config" id="div_login">
+	<!-- <div class="config" id="div_login">
 		<p class="logoutMessage">Session timedout. Please login again.</p>
 		<button id="button-login" type="button" onclick="login()">Login</button>
 		<button id="button-login" type="button" class="resetButton" onclick="reset()">Reset</button>
-	</div>
+	</div> -->
 
 	<script src="lib.js"></script>
 	<script src="main.js"></script>

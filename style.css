@@ -6,20 +6,22 @@
 	margin: 0px;
 }
 
-.menu {
-	background-color: lightgrey;
+.div-display {
 	display: flex;
   flex-direction: row;
   flex-wrap: nowrap;
-  justify-content: flex-end;
-  align-items: flex-end;
+  justify-content: normal;
+  align-items: normal;
   align-content: normal;
-	padding: 10px;
-	border-bottom: 1px solid black;
+	/*border-bottom: 1px solid black;*/
+}
+
+.menu {
+	width: 250px;
 }
 
 .data {
-	margin: 10px;
+	padding: 10px;
 	display: flex;
   flex-direction: column;
   flex-wrap: nowrap;
@@ -28,36 +30,13 @@
   align-content: normal;
 }
 
-.config {
-	padding: 10px;
-	margin: 10rem auto;
-	border: 1px solid gray;
-	border-radius: 5px;
-	width: 325px;
-	display: block;
-	box-shadow: 2px 2px 4px lightgrey;
-	text-align: center;
-}
-
-.config label{
-	margin-right: 10px;
-	width: 75px;
-	display: inline-block;
-}
-
-.config button {
-	width: 75px;
-	height: 25px;
-	box-shadow: 2px 2px 4px lightgrey;
-}
-
-.div-display {
-	display: flex;
-  flex-direction: column;
+.data-control {
+  display: flex;
+  flex-direction: row;
   flex-wrap: nowrap;
-  justify-content: space-between;
-  align-items: stretch;
-  align-content: normal
+  justify-content: normal;
+  align-items: normal;
+  align-content: normal;
 }
 
 .dataTable {
@@ -72,57 +51,12 @@
 	padding: 2px 4px;
 }
 
-.data-control {
-  display: inline-flex;
-  flex-direction: row;
-  flex-wrap: nowrap;
-  justify-content: normal;
-  /*justify-content: space-between;*/
-  align-items: normal;
-  align-content: normal;
-}
-
-.data-control-box {
-	border: 1px solid lightgrey;
-  /*box-shadow: 2px 2px 4px lightgrey;*/
-  padding: 5px;
-	margin: 10px;
-}
-
-.data-releases {
-	display: flex;
-  flex-direction: column;
-  flex-wrap: wrap;
-  justify-content: normal;
-  align-items: normal;
-  align-content: normal;
-  height: 250px;
-  width: 250px;
-}
-
-.data-releases button {
-	margin: 2px;
-	display: flex;
-	width: 115px;
-  height: 25px;
-	line-height: 20px;
-	text-align: center;
-}
-
-.data-releases .specialButton {
-	color: Green;
-	font-weight: bold;
-}
-
-.release-details {
-	margin-left: 20px;
-}
-
 .statusSummaryTable {
 	margin: 10px 0;
 	display: block;
   flex-grow: 0;
   height: 350px;
+  width: 600px;
 }
 
 .statusSummaryTable td {
@@ -164,12 +98,6 @@
 	word-wrap: break-word;
 }
 
-.tableButton2:hover {
-	cursor: pointer;
-	border: 1px solid black;
-	box-shadow: 1px 1px 1px gray;
-}
-
 .flexDataTable {
   display: flex;
   flex-direction: row;
@@ -195,6 +123,38 @@
 	height: 35px;
 	vertical-align: middle;
 	margin-bottom: 2px;
+}
+
+.release-details {
+	margin-left: 20px;
+}
+
+.details {
+	display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  justify-content: normal;
+  align-items: normal;
+  align-content: normal;
+}
+
+.details div {
+	padding: 2px;
+	display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: normal;
+  align-items: normal;
+  align-content: normal;
+}
+
+.details div .key{
+	font-weight: bold;
+	margin-right: 5px;
+}
+
+.details div .value{
+	word-wrap: break-word;
 }
 
 .cellDisabled {
@@ -234,3 +194,26 @@
 	box-shadow: 2px 2px 4px lightcoral;
 	margin: 20px;
 }
+
+/*.config {
+	padding: 10px;
+	margin: 10rem auto;
+	border: 1px solid gray;
+	border-radius: 5px;
+	width: 325px;
+	display: block;
+	box-shadow: 2px 2px 4px lightgrey;
+	text-align: center;
+}
+
+.config label{
+	margin-right: 10px;
+	width: 75px;
+	display: inline-block;
+}
+
+.config button {
+	width: 75px;
+	height: 25px;
+	box-shadow: 2px 2px 4px lightgrey;
+}*/
