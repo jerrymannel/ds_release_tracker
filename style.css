@@ -120,7 +120,6 @@
 .flexDataColumn .columnHeader {
 	border: 1px solid gray;
 	padding: 2px 4px;
-	height: 35px;
 	vertical-align: middle;
 	margin-bottom: 2px;
 }
@@ -159,6 +158,10 @@
 
 .cellDisabled {
 	color: gray;
+}
+
+.width65px {
+	width: 65px;
 }
 
 .highest{ background-color: indianred !important; color:  white !important;}

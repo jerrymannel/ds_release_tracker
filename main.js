@@ -143,6 +143,7 @@ function getDefectPriorityAggregationCB(data){
 	statusSummaryTable.appendChild(generateStatusSummaryRow("statusAll", 2, "Total", {...counter, ...{count}}))
 	getDefectStatusAggregation();
 	getDevTeamDefectStatusAggregation();
+	getQATeamDefectStatusAggregation();
 }
 
 function getDefectStatusAggregation(){
@@ -214,8 +215,93 @@ function getDevTeamDefectStatusAggregation(){
 	apiCaller("POST", "/api/c/data-stack/defects/utils/aggregate", null, null, aggregationPipeline, getDevTeamDefectStatusAggregationCB)
 }
 
+function generateSummaryDataTableCell(id, d) {
+	let div = document.createElement("div");
+	div.setAttribute("class", `${id} tableButton p-1 border width65px`)
+	if(d == 0) div.setAttribute("class", `${id} text-muted p-1 border width65px`)
+	div.addEventListener("click", () => apiCaller("GET", `/api/c/data-stack/defects/${id}`, null, null, null, showDetails));
+	div.innerHTML = d;
+	return div;
+}
+
+var userSummaryColumn1 = d.i("userSummaryColumn1");
+var userSummaryColumn2 = d.i("userSummaryColumn2");
+var userSummaryColumn3 = d.i("userSummaryColumn3");
+var userSummaryColumn4 = d.i("userSummaryColumn4");
+var userSummaryColumn5 = d.i("userSummaryColumn5");
+var userSummaryColumn6 = d.i("userSummaryColumn6");
+var userSummaryColumn7 = d.i("userSummaryColumn7");
 function getDevTeamDefectStatusAggregationCB(data) {
 	console.log(data);
+	userSummaryColumn1.innerHTML = `<div class="columnHeader p-1 width65px">User</div>`;
+	userSummaryColumn2.innerHTML = `<div class="columnHeader p-1 width65px">Total</div>`;
+	userSummaryColumn3.innerHTML = `<div class="columnHeader p-1 width65px highest">Highest</div>`;
+	userSummaryColumn4.innerHTML = `<div class="columnHeader p-1 width65px high">High</div>`;
+	userSummaryColumn5.innerHTML = `<div class="columnHeader p-1 width65px medium">Medium</div>`;
+	userSummaryColumn6.innerHTML = `<div class="columnHeader p-1 width65px low">Low</div>`;
+	userSummaryColumn7.innerHTML = `<div class="columnHeader p-1 width65px lowest">Lowest</div>`;
+	data.forEach(d => {
+		userSummaryColumn1.appendChild(generateSummaryDataTableCell(d._id, d._id.replace("@appveen.com", "")));
+		userSummaryColumn2.appendChild(generateSummaryDataTableCell(d._id, d.count));
+		userSummaryColumn3.appendChild(generateSummaryDataTableCell(d._id, d.highest));
+		userSummaryColumn4.appendChild(generateSummaryDataTableCell(d._id, d.high));
+		userSummaryColumn5.appendChild(generateSummaryDataTableCell(d._id, d.medium));
+		userSummaryColumn6.appendChild(generateSummaryDataTableCell(d._id, d.low));
+		userSummaryColumn7.appendChild(generateSummaryDataTableCell(d._id, d.lowest));
+	});
+}
+
+function getQATeamDefectStatusAggregation(){
+	let aggregationPipeline = [{"$match": {"releaseVersion._id": RELEASE,"status": {"$in": ["Open","Re-Open","In Progress"]}}},{"$group": {"_id": "$reportedBy._id","count": {"$sum": 1},"high": { "$sum": { "$cond": { "else": 0, "if": { "$eq": [ "$priority", "High" ] }, "then": 1 } }},"Ready for QA": { "$sum": { "$cond": { "else": 0, "if": { "$eq": [ "$priority", "Ready for QA" ] }, "then": 1 } }},"Ready for Release": { "$sum": { "$cond": { "else": 0, "if": { "$eq": [ "$priority", "Ready for Release" ] }, "then": 1 } }},"Rejected": { "$sum": { "$cond": { "else": 0, "if": { "$eq": [ "$priority", "Rejected" ] }, "then": 1 } }},"Cannot Reproduce": { "$sum": { "$cond": { "else": 0, "if": { "$eq": [ "$priority", "Cannot Reproduce" ] }, "then": 1 } }},"Working as Expected": { "$sum": { "$cond": { "else": 0, "if": { "$eq": [ "$priority", "Working as Expected" ] }, "then": 1 } }},"Configuration Issue": { "$sum": { "$cond": { "else": 0, "if": { "$eq": [ "$priority", "Configuration Issue" ] }, "then": 1 } }},"Duplicate": { "$sum": { "$cond": { "else": 0, "if": { "$eq": [ "$priority", "Duplicate" ] }, "then": 1 } }},"Fixed": { "$sum": { "$cond": { "else": 0, "if": { "$eq": [ "$priority", "Fixed" ] }, "then": 1 } }},"Ready for I&T": { "$sum": { "$cond": { "else": 0, "if": { "$eq": [ "$priority", "Ready for I&T" ] }, "then": 1 } }},}},{"$sort": {"_id": 1}}];
+	apiCaller("POST", "/api/c/data-stack/defects/utils/aggregate", null, null, aggregationPipeline, getQATeamDefectStatusAggregationCB)
+}
+
+function generateSummaryDataTableCellForQA(id, d) {
+	let div = document.createElement("div");
+	div.setAttribute("class", `${id} tableButton p-1 border`)
+	if(d == 0) div.setAttribute("class", `${id} text-muted p-1 border`)
+	div.addEventListener("click", () => apiCaller("GET", `/api/c/data-stack/defects/${id}`, null, null, null, showDetails));
+	div.innerHTML = d;
+	return div;
+}
+
+var qaSummaryColumn1 = d.i("qaSummaryColumn1");
+var qaSummaryColumn2 = d.i("qaSummaryColumn2");
+var qaSummaryColumn3 = d.i("qaSummaryColumn3");
+var qaSummaryColumn4 = d.i("qaSummaryColumn4");
+var qaSummaryColumn5 = d.i("qaSummaryColumn5");
+var qaSummaryColumn6 = d.i("qaSummaryColumn6");
+var qaSummaryColumn7 = d.i("qaSummaryColumn7");
+var qaSummaryColumn8 = d.i("qaSummaryColumn8");
+var qaSummaryColumn9 = d.i("qaSummaryColumn9");
+var qaSummaryColumn10 = d.i("qaSummaryColumn10");
+var qaSummaryColumn11 = d.i("qaSummaryColumn11");
+function getQATeamDefectStatusAggregationCB(data) {
+	console.log(data);
+	qaSummaryColumn1.innerHTML = `<div class="columnHeader p-1">User</div>`;
+	qaSummaryColumn2.innerHTML = `<div class="columnHeader p-1">Total</div>`;
+	qaSummaryColumn3.innerHTML = `<div class="columnHeader p-1">Fixed</div>`;
+	qaSummaryColumn4.innerHTML = `<div class="columnHeader p-1">R/QA</div>`;
+	qaSummaryColumn5.innerHTML = `<div class="columnHeader p-1">R/I&T</div>`;
+	qaSummaryColumn6.innerHTML = `<div class="columnHeader p-1">R/Release</div>`;
+	qaSummaryColumn7.innerHTML = `<div class="columnHeader p-1">Rejected</div>`;
+	qaSummaryColumn8.innerHTML = `<div class="columnHeader p-1">C/Rep.</div>`;
+	qaSummaryColumn9.innerHTML = `<div class="columnHeader p-1">W/Expected</div>`;
+	qaSummaryColumn10.innerHTML = `<div class="columnHeader p-1">Config. Issue</div>`;
+	qaSummaryColumn11.innerHTML = `<div class="columnHeader p-1">Duplicate</div>`;
+	data.forEach(d => {
+		qaSummaryColumn1.appendChild(generateSummaryDataTableCellForQA(d._id, d._id.replace("@appveen.com", "")));
+		qaSummaryColumn2.appendChild(generateSummaryDataTableCellForQA(d._id, d.count));
+		qaSummaryColumn3.appendChild(generateSummaryDataTableCellForQA(d._id, d["Fixed"]));
+		qaSummaryColumn4.appendChild(generateSummaryDataTableCellForQA(d._id, d["Ready for QA"]));
+		qaSummaryColumn5.appendChild(generateSummaryDataTableCellForQA(d._id, d["Ready for I&T"]));
+		qaSummaryColumn6.appendChild(generateSummaryDataTableCellForQA(d._id, d["Ready for Release"]));
+		qaSummaryColumn7.appendChild(generateSummaryDataTableCellForQA(d._id, d["Rejected"]));
+		qaSummaryColumn8.appendChild(generateSummaryDataTableCellForQA(d._id, d["Cannot Reproduce"]));
+		qaSummaryColumn9.appendChild(generateSummaryDataTableCellForQA(d._id, d["Working as Expected"]));
+		qaSummaryColumn10.appendChild(generateSummaryDataTableCellForQA(d._id, d["Configuration Issue"]));
+		qaSummaryColumn11.appendChild(generateSummaryDataTableCellForQA(d._id, d["Duplicate"]));
+	});
 }
 
 let originalStyle = null
@@ -318,14 +404,14 @@ function showDetails(data){
 	details.appendChild(generateDetailDev("Comments", data.comments));
 }
 
-function generateFlexDataTableCell(id, d, status, priority) {
+function generateFlexDataTableCell(customClasses, d, status, priority) {
 	let div = document.createElement("div");
-	div.setAttribute("class", `${id} tableButton2 ${statusClassMapper[status]} status_${statusClassMapper[status]} priority_${priority.toLowerCase()}`)
+	div.setAttribute("class", `${customClasses.join(" ")} tableButton2 ${statusClassMapper[status]} status_${statusClassMapper[status]} priority_${priority.toLowerCase()}`)
 	if(PRIORITY.indexOf(d.toLowerCase()) != -1)
-		div.setAttribute("class", `${id} tableButton2 ${statusClassMapper[status]} status_${statusClassMapper[status]} priority_${priority.toLowerCase()} ${priority.toLowerCase()}`)
-	div.setAttribute("onmouseenter", `flexDataMouseEnter("${id}")`);
-	div.setAttribute("onmouseleave", `flexDataMouseLeave("${id}")`);
-	div.addEventListener("click", () => apiCaller("GET", `/api/c/data-stack/defects/${id}`, null, null, null, showDetails));
+		div.setAttribute("class", `${customClasses.join(" ")} tableButton2 ${statusClassMapper[status]} status_${statusClassMapper[status]} priority_${priority.toLowerCase()} ${priority.toLowerCase()}`)
+	div.setAttribute("onmouseenter", `flexDataMouseEnter("${customClasses[0]}")`);
+	div.setAttribute("onmouseleave", `flexDataMouseLeave("${customClasses[0]}")`);
+	div.addEventListener("click", () => apiCaller("GET", `/api/c/data-stack/defects/${customClasses[0]}`, null, null, null, showDetails));
 	if(d.indexOf("@") == -1 ) div.innerHTML = d;
 	else div.innerHTML = d.replace("@appveen.com", "");
 	return div;
@@ -345,7 +431,6 @@ function flexDataMouseLeave(id){
 	}
 }
 
-var flexDataTable = d.i("flexDataTable");
 var flexDataColumn1 = d.i("flexDataColumn1");
 var flexDataColumn2 = d.i("flexDataColumn2");
 var flexDataColumn3 = d.i("flexDataColumn3");
@@ -369,19 +454,22 @@ function getDetectsCB(data){
 	flexDataColumn2.innerHTML = `<div class="columnHeader">Summary</div>`;
 	flexDataColumn3.innerHTML = `<div class="columnHeader">Priority</div>`;
 	flexDataColumn4.innerHTML = `<div class="columnHeader">Status</div>`;
-	flexDataColumn5.innerHTML = `<div class="columnHeader">Assigned To</div>`;
-	flexDataColumn6.innerHTML = `<div class="columnHeader">Verified By</div>`;
-	flexDataColumn7.innerHTML = `<div class="columnHeader">Reported By</div>`;
+	flexDataColumn5.innerHTML = `<div class="columnHeader">Dev</div>`;
+	flexDataColumn6.innerHTML = `<div class="columnHeader">QA</div>`;
+	flexDataColumn7.innerHTML = `<div class="columnHeader">Reporter</div>`;
 
 	let div = document.createElement("div");
 	data.forEach(d => {
-		flexDataColumn1.appendChild(generateFlexDataTableCell(d._id, d._id, d.status, d.priority));
-		flexDataColumn2.appendChild(generateFlexDataTableCell(d._id, d.summary, d.status, d.priority));
-		flexDataColumn3.appendChild(generateFlexDataTableCell(d._id, d.priority, d.status, d.priority));
-		flexDataColumn4.appendChild(generateFlexDataTableCell(d._id, d.status, d.status, d.priority));
-		flexDataColumn5.appendChild(generateFlexDataTableCell(d._id, d.assignedTo?._id || "-nil-", d.status, d.priority));
-		flexDataColumn6.appendChild(generateFlexDataTableCell(d._id, d.verifiedBy?._id || "-nil-", d.status, d.priority));
-		flexDataColumn7.appendChild(generateFlexDataTableCell(d._id, d.reportedBy?._id || "-nil-", d.status, d.priority));
+		let assignedTo = d.assignedTo?._id;
+		let verifiedBy = d.verifiedBy?._id;
+		let reportedBy = d.reportedBy?._id;
+		flexDataColumn1.appendChild(generateFlexDataTableCell([d._id, assignedTo, verifiedBy, reportedBy], d._id, d.status, d.priority));
+		flexDataColumn2.appendChild(generateFlexDataTableCell([d._id, assignedTo, verifiedBy, reportedBy], d.summary, d.status, d.priority));
+		flexDataColumn3.appendChild(generateFlexDataTableCell([d._id, assignedTo, verifiedBy, reportedBy], d.priority, d.status, d.priority));
+		flexDataColumn4.appendChild(generateFlexDataTableCell([d._id, assignedTo, verifiedBy, reportedBy], d.status, d.status, d.priority));
+		flexDataColumn5.appendChild(generateFlexDataTableCell([d._id, assignedTo, verifiedBy, reportedBy], assignedTo || "-nil-", d.status, d.priority));
+		flexDataColumn6.appendChild(generateFlexDataTableCell([d._id, assignedTo, verifiedBy, reportedBy], verifiedBy || "-nil-", d.status, d.priority));
+		flexDataColumn7.appendChild(generateFlexDataTableCell([d._id, assignedTo, verifiedBy, reportedBy], reportedBy || "-nil-", d.status, d.priority));
 	});
 	getDefectPriorityAggregation();
 }

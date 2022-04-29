@@ -20,13 +20,33 @@
 
 		<div class="ms-1 p-1 d-flex flex-column">
 			<div class="d-flex flex-row">
-				<div class="card p-2 shadow menu">
-					<button onclick="hideInvalid()" class="btn btn-sm btn-secondary">Hide invalid defects</button>
-				</div>
 				<div class="card p-2 mx-2 shadow">
+					<button onclick="hideInvalid()" class="btn btn-sm btn-secondary">Hide invalid defects</button>
 					<table id="statusSummaryTable" class="statusSummaryTable"></table>
 				</div>
 				<div class="card p-2 shadow">
+					<div id="userSummarytable" class="flexDataTable">
+						<div id="userSummaryColumn1" class="flexDataColumn">Name</div>
+						<div id="userSummaryColumn2" class="flexDataColumn">Total</div>
+						<div id="userSummaryColumn3" class="flexDataColumn">Highest</div>
+						<div id="userSummaryColumn4" class="flexDataColumn">High</div>
+						<div id="userSummaryColumn5" class="flexDataColumn">Medium</div>
+						<div id="userSummaryColumn6" class="flexDataColumn">Low</div>
+						<div id="userSummaryColumn7" class="flexDataColumn">Lowest</div>
+					</div>
+					<div id="qaSummarytable" class="flexDataTable">
+						<div id="qaSummaryColumn1" class="flexDataColumn">Name</div>
+						<div id="qaSummaryColumn2" class="flexDataColumn">Total</div>
+						<div id="qaSummaryColumn3" class="flexDataColumn">Highest</div>
+						<div id="qaSummaryColumn4" class="flexDataColumn">High</div>
+						<div id="qaSummaryColumn5" class="flexDataColumn">Medium</div>
+						<div id="qaSummaryColumn6" class="flexDataColumn">Low</div>
+						<div id="qaSummaryColumn7" class="flexDataColumn">Lowest</div>
+						<div id="qaSummaryColumn8" class="flexDataColumn">Lowest</div>
+						<div id="qaSummaryColumn9" class="flexDataColumn">Lowest</div>
+						<div id="qaSummaryColumn10" class="flexDataColumn">Lowest</div>
+						<div id="qaSummaryColumn11" class="flexDataColumn">Lowest</div>
+					</div>
 				</div>
 			</div>
 
